@@ -5,7 +5,7 @@ Drive WS2812 ("NeoPixel") LED strips from a flight-controller PWM channel on a
 the colour/animation; the LEDs are clocked entirely by the RP2040's **PIO**
 peripheral, so the timing is rock-solid and the CPU stays free.
 
-- Three independent WS2812 strips (default: **GP29**, **GP28** and **GP27**)
+- Five independent WS2812 strips (default: **GP29**, **GP28**, **GP27**, **GP26** and **GP15**)
 - Mode selected by an RC/flight-controller **PWM** input (default: **GP2**)
 - Per-position colour, animation and brightness configured **in code** — no
   serial console needed at runtime
@@ -19,6 +19,8 @@ peripheral, so the timing is rock-solid and the CPU stays free.
 | LED strip 1 data  | GP29            | bottom pad                              |
 | LED strip 2 data  | GP28            | bottom pad                              |
 | LED strip 3 data  | GP27            | bottom pad                              |
+| LED strip 4 data  | GP26            | bottom pad                              |
+| LED strip 5 data  | GP15            |                                         |
 | FC PWM input      | GP2             | 6-position switch channel               |
 | Ground            | GND             | **must** be common with the FC and LEDs |
 
@@ -57,6 +59,10 @@ constexpr uint8_t  STRIP2_PIN = 28;
 constexpr uint16_t STRIP2_LEN = 80;   // LED count of strip 2
 constexpr uint8_t  STRIP3_PIN = 27;
 constexpr uint16_t STRIP3_LEN = 80;   // LED count of strip 3
+constexpr uint8_t  STRIP4_PIN = 26;
+constexpr uint16_t STRIP4_LEN = 72;   // LED count of strip 4
+constexpr uint8_t  STRIP5_PIN = 15;
+constexpr uint16_t STRIP5_LEN = 72;   // LED count of strip 5
 constexpr uint8_t  PWM_PIN    = 2;
 ```
 

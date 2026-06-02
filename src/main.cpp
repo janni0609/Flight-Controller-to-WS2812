@@ -1,16 +1,18 @@
 // -----------------------------------------------------------------------------
 // WS2812 driver - Waveshare RP2040-Zero
 //
-// Three WS2812 strips driven by the RP2040 PIO peripheral:
+// Five WS2812 strips driven by the RP2040 PIO peripheral:
 //     strip 1 -> GP29
 //     strip 2 -> GP28
 //     strip 3 -> GP27
+//     strip 4 -> GP26
+//     strip 5 -> GP15
 //
 // A flight-controller PWM channel on GP2 (6-position switch) selects the mode.
 // What each strip shows for each switch position - colour, animation and
 // brightness - is configured in the tables below, in code (no serial control).
 //
-// To customise: edit STRIP1 / STRIP2 / STRIP3 / the three config tables. That's it.
+// To customise: edit STRIP1 / STRIP2 / STRIP3 / STRIP4 / STRIP5 / the five config tables. That's it.
 // -----------------------------------------------------------------------------
 #include <Arduino.h>
 #include "WS2812Strip.h"
@@ -26,11 +28,19 @@ constexpr uint16_t STRIP2_LEN = 80;    // <-- set to your 2nd strip's LED count
 constexpr uint8_t  STRIP3_PIN = 27;   // GP27
 constexpr uint16_t STRIP3_LEN = 80;    // <-- set to your 3rd strip's LED count
 
+constexpr uint8_t  STRIP4_PIN = 26;   // GP26
+constexpr uint16_t STRIP4_LEN = 72;    // <-- set to your 4th strip's LED count
+
+constexpr uint8_t  STRIP5_PIN = 15;   // GP15
+constexpr uint16_t STRIP5_LEN = 72;    // <-- set to your 5th strip's LED count
+
 constexpr uint8_t  PWM_PIN    = 2;    // GP2 <- PWM from flight controller
 
 WS2812Strip strip1(STRIP1_PIN, STRIP1_LEN);
 WS2812Strip strip2(STRIP2_PIN, STRIP2_LEN);
 WS2812Strip strip3(STRIP3_PIN, STRIP3_LEN);
+WS2812Strip strip4(STRIP4_PIN, STRIP4_LEN);
+WS2812Strip strip5(STRIP5_PIN, STRIP5_LEN);
 RcPwm       rc;
 
 // ============================ ANIMATIONS ====================================
@@ -81,6 +91,26 @@ LedConfig strip3Cfg[7] = {
     /* 0 no sig */ { ANIM_OFF,    0x000000, 0x000000,   0 },
     /* 1        */ { ANIM_OFF,    0x000000, 0x000000,   0 },   // all LEDs off
     /* 2        */ { ANIM_DBLFLASH, 0x00FF00, 0xFFFFFF,  255 },   // green
+    /* 3        */ { ANIM_DBLFLASH, 0x00FF00, 0xFFFFFF,  255 },   // green
+    /* 4        */ { ANIM_DBLFLASH, 0x0000FF, 0xFFFFFF,  255 },   // blue
+    /* 5        */ { ANIM_DBLFLASH, 0xFF00FF, 0xFFFFFF,  255 },   // magenta
+    /* 6        */ { ANIM_RAINBOW,0x000000, 0x000000,  255 },   // rainbow
+};
+
+LedConfig strip4Cfg[7] = {
+    /* 0 no sig */ { ANIM_OFF,    0x000000, 0x000000,   0 },
+    /* 1        */ { ANIM_OFF,    0x000000, 0x000000,   0 },   // all LEDs off
+    /* 2        */ { ANIM_DBLFLASH, 0x00FF00, 0xFFFFFF,  255 },   // green
+    /* 3        */ { ANIM_DBLFLASH, 0x00FF00, 0xFFFFFF,  255 },   // green
+    /* 4        */ { ANIM_DBLFLASH, 0x0000FF, 0xFFFFFF,  255 },   // blue
+    /* 5        */ { ANIM_DBLFLASH, 0xFF00FF, 0xFFFFFF,  255 },   // magenta
+    /* 6        */ { ANIM_RAINBOW,0x000000, 0x000000,  255 },   // rainbow
+};
+
+LedConfig strip5Cfg[7] = {
+    /* 0 no sig */ { ANIM_OFF,    0x000000, 0x000000,   0 },
+    /* 1        */ { ANIM_OFF,    0x000000, 0x000000,   0 },   // all LEDs off
+    /* 2        */ { ANIM_DBLFLASH, 0xFF0000, 0xFFFFFF,  255 },   // red
     /* 3        */ { ANIM_DBLFLASH, 0x00FF00, 0xFFFFFF,  255 },   // green
     /* 4        */ { ANIM_DBLFLASH, 0x0000FF, 0xFFFFFF,  255 },   // blue
     /* 5        */ { ANIM_DBLFLASH, 0xFF00FF, 0xFFFFFF,  255 },   // magenta
@@ -186,7 +216,7 @@ int readPosition() {
 void setup() {
     Serial.begin(115200);   // optional: status output only, no commands
 
-    if (!strip1.begin() || !strip2.begin() || !strip3.begin()) {
+    if (!strip1.begin() || !strip2.begin() || !strip3.begin() || !strip4.begin() || !strip5.begin()) {
         while (true) { Serial.println(F("ERROR: no free PIO state machine")); delay(1000); }
     }
 
@@ -211,5 +241,7 @@ void loop() {
         renderStrip(strip1, strip1Cfg[pos]);
         renderStrip(strip2, strip2Cfg[pos]);
         renderStrip(strip3, strip3Cfg[pos]);
+        renderStrip(strip4, strip4Cfg[pos]);
+        renderStrip(strip5, strip5Cfg[pos]);
     }
 }
